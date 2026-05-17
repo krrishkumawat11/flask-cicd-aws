@@ -1,4 +1,4 @@
-# 🚀 DevOps Project: Automated CI/CD Pipeline for a 2-Tier Flask Application on AWS
+# DevOps Project: Automated CI/CD Pipeline for a 2-Tier Flask Application on AWS
 
 **Author:** Krrish Kumawat &nbsp;|&nbsp; **Date:** May 2026
 
@@ -11,13 +11,13 @@
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
 In this project, I built a **fully automated CI/CD pipeline** to deploy a 2-tier Flask + MySQL application on **AWS EC2** using **Jenkins**, **Docker**, and **Docker Compose**. It integrates GitHub for version control and ensures seamless, hands-free deployments on every code push via GitHub Webhooks.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 1. [Architecture Diagram](#architecture-diagram)
 2. [Tech Stack](#tech-stack)
@@ -31,7 +31,7 @@ In this project, I built a **fully automated CI/CD pipeline** to deploy a 2-tier
 
 ---
 
-## 🏗️ Architecture Diagram
+## Architecture Diagram
 
 ```
 +-----------------+      +----------------------+      +-----------------------------+
@@ -62,7 +62,7 @@ In this project, I built a **fully automated CI/CD pipeline** to deploy a 2-tier
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Tool | Purpose |
 |------|---------|
@@ -109,15 +109,48 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install openjdk-17-jdk -y
 java -version
 
-# Install Docker
-sudo apt install docker.io -y
-sudo systemctl start docker
-sudo systemctl enable docker
+# Set up Docker's apt repository.
 
-# Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-docker-compose --version
+# Add Docker's official GPG key:
+sudo apt update
+sudo apt install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+sudo apt update
+
+# Install the Docker packages.
+
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl status docker
+sudo systemctl start docker
+
+# Update the Debian apt repositories, install OpenJDK 21
+
+sudo apt update
+sudo apt install fontconfig openjdk-21-jre
+java -version
+
+# Add Jenkins Repository and Install
+
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt update
+sudo apt install jenkins
 
 # Add swap memory (for t2.micro)
 sudo fallocate -l 2G /swapfile
@@ -275,8 +308,8 @@ pipeline {
 1. Jenkins Dashboard → **New Item**
 2. Name: `flask-cicd-pipeline` → Select **Pipeline** → OK
 3. Configure:
-   - ✅ **GitHub project** → Enter repo URL
-   - ✅ **GitHub hook trigger for GITScm polling** (for auto-deploy)
+   - **GitHub project** → Enter repo URL
+   - **GitHub hook trigger for GITScm polling** (for auto-deploy)
    - **Pipeline Definition:** Pipeline script from SCM
    - **SCM:** Git
    - **Repository URL:** `https://github.com/krrishkumawat11/flask-cicd-aws.git`
@@ -293,15 +326,15 @@ pipeline {
 2. Fill in:
    - **Payload URL:** `http://<your-ec2-ip>:8080/github-webhook/`
    - **Content type:** `application/json`
-   - **Events:** Just the push event ✅
-   - **Active:** ✅
+   - **Events:** Just the push event 
+   - **Active:** 
 3. Click **Add webhook**
 
-Now every `git push` will **automatically trigger** the Jenkins pipeline! 🚀
+Now every `git push` will **automatically trigger** the Jenkins pipeline! 
 
 ---
 
-## ✅ Conclusion
+## Conclusion
 
 The CI/CD pipeline is now **fully operational**. Any `git push` to the `main` branch automatically:
 
@@ -313,9 +346,12 @@ The CI/CD pipeline is now **fully operational**. Any `git push` to the `main` br
 **Live App:** `http://<your-ec2-ip>:3000`  
 **Jenkins Dashboard:** `http://<your-ec2-ip>:8080`
 
----
+## Infrastructure Diagram
 
-## 🎯 Key Learnings
+---<img width="1000" height="1600" alt="infra_final" src="https://github.com/user-attachments/assets/01555f7e-a4e7-422f-acbc-e4929c610c8e" />
+
+
+## Key Learnings
 
 - Setting up Jenkins CI/CD pipeline from scratch on AWS EC2
 - Containerizing a multi-tier app with Docker & Docker Compose
@@ -325,6 +361,6 @@ The CI/CD pipeline is now **fully operational**. Any `git push` to the `main` br
 
 ---
 
-## 🏷️ Topics
+## Topics
 
 `jenkins` `docker` `docker-compose` `flask` `mysql` `aws` `ec2` `cicd` `devops` `github-webhooks` `automation` `containerization` `devops-project`
